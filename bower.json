@@ -4,6 +4,7 @@
   "main": "ct-bank-account-selector.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
+    "ct-core-utils": "git://github.com/centular-elements/ct-core-utils",
     "ct-bank-accounts-api":"centular-elements/ct-bank-accounts-api",
     "ct-bank-account":"centular-elements/ct-bank-account",
     "paper-item": "PolymerElements/paper-item#^1.2.1",

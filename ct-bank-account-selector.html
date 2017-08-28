@@ -4,6 +4,7 @@
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../ct-bank-account/ct-bank-account.html">
 <link rel="import" href="../ct-bank-accounts-api/ct-bank-accounts-api.html">
+<link rel="import" href="../ct-core-utils/ct-api-consumer-behaviour.html">
 <!--
 `ct-bank-account-selector`
 Element for selecting a specific bank account of an owner
@@ -47,11 +48,11 @@ Element for selecting a specific bank account of an owner
 
   <script>
     Polymer({
-
       is: 'ct-bank-account-selector',
+      behaviors: [CT.Behaviours.ApiConsumer],
 
       properties: {
-        ownerId: String
+        ownerId: String,
       },
 
       observers: [
@@ -87,8 +88,6 @@ Element for selecting a specific bank account of an owner
                 .catch(this.fire.bind(this, 'toast', {message: 'Failed to load bank account', type: 'danger'}))
                 .finally(this.set.bind(this, 'refreshing', false));
       },
-
-
 
 
     });
