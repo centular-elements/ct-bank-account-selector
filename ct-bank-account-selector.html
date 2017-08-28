@@ -31,21 +31,23 @@ Element for selecting a specific bank account of an owner
 
     <div class="row">
       <div class="col-xs-12 col-sm-6">
-        <paper-dropdown-menu
-                class="custom-dropdown"
-                id="accountsDropDown"
-                label="Account"
-                always-float-label
-                noink
-                no-animations
-                required
-                placeholder="Please select an account">
-          <paper-listbox class="dropdown-content" attr-for-selected="key">
-            <template is="dom-repeat" items="[[ _accounts ]]">
-              <paper-item key="[[item.id]]" item="[[item]]">[[item.bank]] [[ item.accountType.name ]] ([[ item.accountNumber ]])</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
+        <template is="dom-if" if="[[ !readonly ]]">
+          <paper-dropdown-menu
+                  class="custom-dropdown"
+                  id="accountsDropDown"
+                  label="Account"
+                  always-float-label
+                  noink
+                  no-animations
+                  required
+                  placeholder="Please select an account">
+            <paper-listbox class="dropdown-content" attr-for-selected="key">
+              <template is="dom-repeat" items="[[ _accounts ]]">
+                <paper-item key="[[item.id]]" item="[[item]]">[[item.bank]] [[ item.accountType.name ]] ([[ item.accountNumber ]])</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </template>
       </div>
     </div>
 
@@ -59,15 +61,21 @@ Element for selecting a specific bank account of an owner
       behaviors: [CT.Behaviours.ApiConsumer],
 
       properties: {
-        ownerId: String
+        ownerId: String,
+        selectedAccountId: String,
+        readonly: {
+          type: Boolean,
+          value: false
+        }
       },
 
       observers: [
-        '_getOwnerBankAccounts(ownerId)'
+        '_getOwnerBankAccounts(ownerId)',
+        '_getBankAccount(selectedAccountId)'
       ],
 
       listeners: {
-        'selected-item-changed': '_getBankAccount'
+        'selected-item-changed': '_selectedItemChanged'
       },
 
       ready: function() {
@@ -88,11 +96,17 @@ Element for selecting a specific bank account of an owner
                 .finally(this.set.bind(this, 'refreshing', false));
       },
 
-      _getBankAccount: function () {
+      _selectedItemChanged: function () {
         var accountsDropDown = this.$$('#accountsDropDown');
         if (accountsDropDown && accountsDropDown.selectedItem && accountsDropDown.selectedItem.item &&
                 (!this._selectedAccount || accountsDropDown.selectedItem.item.id != this._selectedAccount.id)) {
-          this.$.bankAccountsApi.getBankAccount(accountsDropDown.selectedItem.item.id)
+          this._getBankAccount(accountsDropDown.selectedItem.item.id)
+        }
+      },
+
+      _getBankAccount: function (id) {
+        if (id) {
+          this.$.bankAccountsApi.getBankAccount(id)
                   .then(this._setPropertyResponse.bind(this, '_selectedAccount'))
                   .catch(this.fire.bind(this, 'toast', {message: 'Failed to load bank account', type: 'danger'}))
                   .finally(this.set.bind(this, 'refreshing', false));
@@ -100,11 +114,16 @@ Element for selecting a specific bank account of an owner
       },
 
       validate: function () {
-        return this.$$('#accountsDropDown').validate();
+        var accountsDropDown = this.$$('#accountsDropDown');
+        return !accountsDropDown || accountsDropDown.validate();
       },
 
       serialize: function () {
         return this._selectedAccount;
+      },
+
+      clear: function () {
+        this.$.bankAccountElement.clear();
       }
 
 
