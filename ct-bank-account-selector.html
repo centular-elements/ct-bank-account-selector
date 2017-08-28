@@ -1,0 +1,96 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../ct-bank-account/ct-bank-account.html">
+<link rel="import" href="../ct-bank-accounts-api/ct-bank-accounts-api.html">
+<!--
+`ct-bank-account-selector`
+Element for selecting a specific bank account of an owner
+
+@demo demo/index.html 
+-->
+
+<dom-module id="ct-bank-account-selector">
+  <template>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <ct-bank-accounts-api id="bankAccountsApi"></ct-bank-accounts-api>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-4">
+        <paper-dropdown-menu
+                class="custom-dropdown"
+                id="accountsDropDown"
+                label="Account"
+                always-float-label
+                noink
+                no-animations
+                placeholder="Please select an account">
+          <paper-listbox class="dropdown-content" attr-for-selected="key">
+            <template is="dom-repeat" items="[[ _accounts ]]">
+              <paper-item key="[[item.id]]" item="[[item]]">[[item.name]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+    </div>
+
+    <ct-bank-account id="bankAccountElement" account-types="[[ _accountTypes ]]" account="[[ _selectedAccount ]]" readonly></ct-bank-account>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'ct-bank-account-selector',
+
+      properties: {
+        ownerId: String
+      },
+
+      observers: [
+        '_getOwnerBankAccounts(ownerId)'
+      ],
+
+      listeners: {
+        'selected-item-changed': '_getBankAccount'
+      },
+
+      ready: function() {
+        this._getAccountTypes();
+      },
+
+      _getAccountTypes: function () {
+        this.$.bankAccountsApi.getBankAccountTypes()
+                .then(this._setPropertyResponse.bind(this, '_accountTypes'))
+                .catch(this.fire.bind(this, 'toast', {message: 'Failed to load bank account types', type: 'danger'}))
+                .finally(this.set.bind(this, 'refreshing', false));
+      },
+
+      _getOwnerBankAccounts: function() {
+        this.$.bankAccountsApi.filterOwnerBankAccounts(this.ownerId)
+                .then(this._setPropertyResponseResults.bind(this, '_accounts'))
+                .catch(this.fire.bind(this, 'toast', {message: 'Failed to load owner bank accounts', type: 'danger'}))
+                .finally(this.set.bind(this, 'refreshing', false));
+      },
+
+      _getBankAccount: function () {
+        var selectedAccount = this.$$('#accountsDropDown').selectedItem.item;
+        this.$.bankAccountsApi.getBankAccount(selectedAccount.id)
+                .then(this._setPropertyResponse.bind(this, '_selectedAccount'))
+                .catch(this.fire.bind(this, 'toast', {message: 'Failed to load bank account', type: 'danger'}))
+                .finally(this.set.bind(this, 'refreshing', false));
+      },
+
+
+
+
+    });
+  </script>
+</dom-module>

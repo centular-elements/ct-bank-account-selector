@@ -1,0 +1,19 @@
+{
+  "name": "ct-bank-account-selector",
+  "description": "Element for selecting a specific bank account of an owner",
+  "main": "ct-bank-account-selector.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "ct-bank-accounts-api":"centular-elements/ct-bank-accounts-api",
+    "ct-bank-account":"centular-elements/ct-bank-account",
+    "paper-item": "PolymerElements/paper-item#^1.2.1",
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.2",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}
